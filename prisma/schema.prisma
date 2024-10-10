@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Patient {
+  id               String      @id
+  gender           String
+  anchorAge        Int
+  anchorYear       Int
+  anchorYearGroup  String
+  dod              DateTime?
+  admissions       Admission[]
+  labResults       LabResult[]
+  medications      Medication[]
+}
+
+model Admission {
+  id                  String   @id @default(uuid())
+  patientId           String
+  patient             Patient  @relation(fields: [patientId], references: [id])
+  admittime           DateTime
+  dischtime           DateTime
+  deathtime           DateTime?
+  admissionType       String
+  admitProviderId     String
+  admissionLocation   String
+  dischargeLocation   String
+  insurance           String
+  language            String
+  maritalStatus       String
+  race                String
+  edregtime           DateTime?
+  edouttime           DateTime?
+  hospitalExpireFlag  Int
+}
+
+model LabResult {
+  id           String   @id @default(uuid())
+  patientId    String
+  patient      Patient  @relation(fields: [patientId], references: [id])
+  chartdate    DateTime
+  seqNum       Int
+  resultName   String
+  resultValue  String
+}
+
+model Medication {
+  id              String   @id @default(uuid())
+  patientId       String
+  patient         Patient  @relation(fields: [patientId], references: [id])
+  hadmId          String
+  pharmacyId      String
+  starttime       DateTime
+  stoptime        DateTime
+  drugType        String
+  drug            String
+  prodStrength    String
+  doseValRx       String
+  doseUnitRx      String
+  formValDisp     String
+  formUnitDisp    String
+  route           String
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+}
