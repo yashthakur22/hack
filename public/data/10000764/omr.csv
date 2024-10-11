@@ -1,0 +1,5 @@
+,subject_id,chartdate,seq_num,result_name,result_value
+216,10000764,2132-10-15,1,BMI (kg/m2),28.6
+217,10000764,2132-10-15,1,Height (Inches),65
+218,10000764,2132-10-15,1,Weight (Lbs),199.51
+219,10000764,2132-10-15,2,Height (Inches),70

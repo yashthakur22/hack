@@ -1,0 +1,5 @@
+transfer_id,subject_id,hadm_id,eventtype,careunit,intime,outtime
+32482863,10000560,28979390.0,discharge,UNKNOWN,2189-10-17 14:59:09,
+34247338,10000560,28979390.0,admit,Discharge Lounge,2189-10-15 02:27:58,2189-10-15 19:57:50
+37096825,10000560,28979390.0,transfer,Medical/Surgical (Gynecology),2189-10-15 19:57:50,2189-10-17 14:59:09
+34600506,10000560,,ED,Emergency Department,2189-06-26 12:29:00,2189-06-26 17:36:00

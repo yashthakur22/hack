@@ -1,0 +1,2 @@
+hadm_id,subject_id,admittime,dischtime,deathtime,admission_type,admit_provider_id,admission_location,discharge_location,insurance,language,marital_status,race,edregtime,edouttime,hospital_expire_flag
+28979390,10000560,2189-10-15 10:30:00,2189-10-17 15:00:00,,SURGICAL SAME DAY ADMISSION,P64FPX,PHYSICIAN REFERRAL,HOME,Private,English,MARRIED,WHITE,,,0
