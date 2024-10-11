@@ -1,0 +1,8 @@
+subject_id,chartdate,seq_num,result_name,result_value
+10000560,2188-08-20,1,Blood Pressure,110/68
+10000560,2188-08-20,1,Weight (Lbs),137.4
+10000560,2189-07-02,1,Blood Pressure,130/80
+10000560,2189-07-02,1,Weight (Lbs),144
+10000560,2189-09-24,1,Blood Pressure,104/68
+10000560,2189-10-28,1,Blood Pressure,124/78
+10000560,2190-06-24,1,Weight (Lbs),128

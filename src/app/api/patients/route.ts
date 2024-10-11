@@ -1,17 +1,18 @@
-import { NextResponse } from 'next/server'
-import prisma from '@/app/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import fs from 'fs/promises'
+import path from 'path'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const patients = await prisma.patient.findMany({
-      include: {
-        admissions: true,
-        labResults: true,
-        medications: true,
-      },
-    })
-    return NextResponse.json(patients)
+    const patientDataPath = path.join(process.cwd(), 'public', 'patient_data')
+    const folders = await fs.readdir(patientDataPath, { withFileTypes: true })
+    const patientIds = folders
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name)
+
+    return NextResponse.json(patientIds)
   } catch (error) {
-    return NextResponse.json({ error: 'Error fetching patients' }, { status: 500 })
+    console.error('Error fetching patient IDs:', error)
+    return NextResponse.json({ message: 'Error fetching patient IDs' }, { status: 500 })
   }
 }

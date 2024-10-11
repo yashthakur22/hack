@@ -1,10 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Patient, Message } from '../models/types'
 import { FaRobot, FaPaperPlane } from 'react-icons/fa'
 
 type AICopilotProps = {
-  patient: Patient | null
+  patient: any // Update this type based on your patient info structure
   onMessageSent: (message: string) => void
+}
+
+type Message = {
+  id: string
+  role: 'user' | 'ai'
+  content: string
 }
 
 export default function AICopilot({ patient, onMessageSent }: AICopilotProps) {
@@ -25,7 +30,6 @@ export default function AICopilot({ patient, onMessageSent }: AICopilotProps) {
         id: Date.now().toString(),
         role: 'user',
         content: input,
-        createdAt: new Date().toISOString(),
       }
       setMessages(prevMessages => [...prevMessages, userMessage])
       setInput('')
@@ -37,8 +41,7 @@ export default function AICopilot({ patient, onMessageSent }: AICopilotProps) {
         const aiMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'ai',
-          content: `Hmm, that's interesting...david has to answer this one "${input}"`,
-          createdAt: new Date().toISOString(),
+          content: `This is a simulated response to: "${input}" for patient ${patient.subject_id}`,
         }
         setMessages(prevMessages => [...prevMessages, aiMessage])
         setIsTyping(false)
@@ -62,7 +65,7 @@ export default function AICopilot({ patient, onMessageSent }: AICopilotProps) {
         {isTyping && (
           <div className="text-left">
             <span className="inline-block p-3 rounded-lg bg-gray-200 text-gray-500">
-              Checking the database...
+              AI is typing...
             </span>
           </div>
         )}

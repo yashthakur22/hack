@@ -1,19 +1,26 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Patient } from '../models/types'
 import PatientInfo from './PatientInfo'
 import LabResults from './LabResults'
 import Medications from './Medications'
 import Admissions from './Admissions'
 import AICopilot from './AICopilot'
 import Citations from './Citations'
-import { Panel as ResizablePanel, PanelGroup as ResizablePanelGroup } from 'react-resizable-panels'
-import { FaChevronLeft, FaChevronRight, FaUser, FaClipboardList, FaPills, FaHospital } from 'react-icons/fa'
+import { Panel as ResizablePanel, PanelGroup as ResizablePanelGroup, PanelResizeHandle as ResizeHandle } from 'react-resizable-panels'
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+
+type PatientData = {
+  patientInfo: any[]
+  labResults: any[]
+  medications: any[]
+  admissions: any[]
+}
 
 export default function Dashboard() {
-  const [patients, setPatients] = useState<Patient[]>([])
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
+  const [patientIds, setPatientIds] = useState<string[]>([])
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null)
+  const [patientData, setPatientData] = useState<PatientData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [citations, setCitations] = useState<string[]>([])
@@ -21,20 +28,43 @@ export default function Dashboard() {
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false)
 
   useEffect(() => {
-    fetchPatients()
+    fetchPatientIds()
   }, [])
 
-  const fetchPatients = async () => {
+  useEffect(() => {
+    if (selectedPatientId) {
+      fetchPatientData(selectedPatientId)
+    }
+  }, [selectedPatientId])
+
+  const fetchPatientIds = async () => {
     try {
       const response = await fetch('/api/patients')
-      const data = await response.json()
-      setPatients(data)
-      if (data.length > 0) {
-        setSelectedPatient(data[0])
+      if (!response.ok) {
+        throw new Error('Failed to fetch patient IDs')
       }
+      const ids = await response.json()
+      setPatientIds(ids)
+      if (ids.length > 0) {
+        setSelectedPatientId(ids[0])
+      }
+    } catch (error) {
+      setError('Error fetching patient IDs')
+    }
+  }
+
+  const fetchPatientData = async (id: string) => {
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/patient/${id}`)
+      if (!response.ok) {
+        throw new Error('Failed to fetch patient data')
+      }
+      const data = await response.json()
+      setPatientData(data)
       setLoading(false)
     } catch (error) {
-      setError('Error fetching patients')
+      setError('Error fetching patient data')
       setLoading(false)
     }
   }
@@ -55,8 +85,9 @@ export default function Dashboard() {
           minSize={15}
           maxSize={40}
           collapsible={true}
-          onCollapse={() => setLeftPanelCollapsed(true)}
-          onExpand={() => setLeftPanelCollapsed(false)}
+          onCollapse={() => setLeftPanelCollapsed(!leftPanelCollapsed)}
+          collapsedSize={0}
+          className={leftPanelCollapsed ? 'min-w-[40px]' : ''}
         >
           <div className="h-full bg-white shadow-md p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
@@ -68,41 +99,51 @@ export default function Dashboard() {
                 {leftPanelCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
               </button>
             </div>
-            <select 
-              onChange={(e) => setSelectedPatient(patients.find(p => p.id === e.target.value) || null)}
-              className="w-full p-2 mb-4 border rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {patients.map(patient => (
-                <option key={patient.id} value={patient.id}>
-                  Patient {patient.id}
-                </option>
-              ))}
-            </select>
-            
-            {selectedPatient && (
-              <div className="space-y-4">
-                <PatientInfo patient={selectedPatient} />
-                <LabResults labResults={selectedPatient.labResults} />
-                <Medications medications={selectedPatient.medications} />
-                <Admissions admissions={selectedPatient.admissions} />
-              </div>
+            {!leftPanelCollapsed && (
+              <>
+                <select 
+                  onChange={(e) => setSelectedPatientId(e.target.value)}
+                  value={selectedPatientId || ''}
+                  className="w-full p-2 mb-4 border rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {patientIds.map(id => (
+                    <option key={id} value={id}>
+                      Patient {id}
+                    </option>
+                  ))}
+                </select>
+                
+                {patientData && (
+                  <div className="space-y-4">
+                    <PatientInfo patientInfo={patientData.patientInfo[0]} />
+                    <LabResults labResults={patientData.labResults} />
+                    <Medications medications={patientData.medications} />
+                    <Admissions admissions={patientData.admissions} />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </ResizablePanel>
 
+        <ResizeHandle className="w-2 bg-gray-200 hover:bg-gray-300 transition-colors duration-200" />
+
         <ResizablePanel defaultSize={50} minSize={30}>
           <div className="h-full bg-white shadow-md p-4">
-            <AICopilot patient={selectedPatient} onMessageSent={handleMessageSent} />
+            <AICopilot patient={patientData?.patientInfo[0]} onMessageSent={handleMessageSent} />
           </div>
         </ResizablePanel>
+
+        <ResizeHandle className="w-2 bg-gray-200 hover:bg-gray-300 transition-colors duration-200" />
 
         <ResizablePanel
           defaultSize={25}
           minSize={15}
           maxSize={40}
           collapsible={true}
-          onCollapse={() => setRightPanelCollapsed(true)}
-          onExpand={() => setRightPanelCollapsed(false)}
+          onCollapse={() => setRightPanelCollapsed(!rightPanelCollapsed)}
+          collapsedSize={0}
+          className={rightPanelCollapsed ? 'min-w-[40px]' : ''}
         >
           <div className="h-full bg-white shadow-md p-4">
             <div className="flex items-center justify-between mb-4">
@@ -114,7 +155,7 @@ export default function Dashboard() {
                 {rightPanelCollapsed ? <FaChevronLeft /> : <FaChevronRight />}
               </button>
             </div>
-            <Citations citations={citations} />
+            {!rightPanelCollapsed && <Citations citations={citations} />}
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>

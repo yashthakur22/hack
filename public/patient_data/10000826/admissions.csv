@@ -1,0 +1,4 @@
+subject_id,hadm_id,admittime,dischtime,deathtime,admission_type,admit_provider_id,admission_location,discharge_location,insurance,language,marital_status,race,edregtime,edouttime,hospital_expire_flag
+10000826,20032235,2146-12-05 19:07:00,2146-12-12 16:30:00,,EW EMER.,P278S6,EMERGENCY ROOM,HOME,Private,English,SINGLE,WHITE,2146-12-05 11:09:00,2146-12-05 20:54:00,0
+10000826,21086876,2146-12-18 17:39:00,2146-12-24 19:55:00,,DIRECT EMER.,P61YAW,CLINIC REFERRAL,HOME,Private,English,SINGLE,WHITE,,,0
+10000826,28289260,2146-12-31 00:43:00,2147-01-02 17:45:00,,EW EMER.,P19UTS,EMERGENCY ROOM,HOME,Private,English,SINGLE,WHITE,2146-12-30 17:06:00,2146-12-31 02:10:00,0

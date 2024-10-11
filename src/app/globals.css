@@ -90,3 +90,27 @@ body {
 .resizer.resizing {
   background-color: #a0aec0;
 }
+
+[data-panel] {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-panel-resizer] {
+  width: 4px;
+  background-color: #e5e7eb;
+  transition: background-color 0.2s;
+}
+
+[data-panel-resizer]:hover {
+  background-color: #d1d5db;
+}
+
+[data-panel-group] {
+  display: flex;
+  height: 100%;
+}
+
+[data-panel-group][data-panel-group-direction="horizontal"] {
+  flex-direction: row;
+}
