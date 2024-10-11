@@ -1,21 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { FaRobot, FaPaperPlane } from 'react-icons/fa'
 
-type AICopilotProps = {
-  patient: any // Update this type based on your patient info structure
-  onMessageSent: (message: string) => void
-}
-
 type Message = {
   id: string
   role: 'user' | 'ai'
   content: string
 }
 
+type AICopilotProps = {
+  patient: any
+  onMessageSent: (message: string) => void
+}
+
 export default function AICopilot({ patient, onMessageSent }: AICopilotProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -34,18 +34,37 @@ export default function AICopilot({ patient, onMessageSent }: AICopilotProps) {
       setMessages(prevMessages => [...prevMessages, userMessage])
       setInput('')
       onMessageSent(input)
-      setIsTyping(true)
+      setIsLoading(true)
 
-      // Simulate AI response
-      setTimeout(() => {
+      try {
+        const response = await fetch('https://7885-128-218-42-132.ngrok-free.app/invoke', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            query: input,
+            sessionId: "anything" 
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok')
+        }
+
+        const data = await response.json()
+        
         const aiMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'ai',
-          content: `This is a simulated response to: "${input}" for patient ${patient.subject_id}`,
+          content: data.response, 
         }
         setMessages(prevMessages => [...prevMessages, aiMessage])
-        setIsTyping(false)
-      }, 1500)
+      } catch (error) {
+        console.error('Error:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -62,7 +81,7 @@ export default function AICopilot({ patient, onMessageSent }: AICopilotProps) {
             </span>
           </div>
         ))}
-        {isTyping && (
+        {isLoading && (
           <div className="text-left">
             <span className="inline-block p-3 rounded-lg bg-gray-200 text-gray-500">
               AI is typing...
@@ -83,6 +102,7 @@ export default function AICopilot({ patient, onMessageSent }: AICopilotProps) {
         <button 
           onClick={handleSend} 
           className="p-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition duration-200"
+          disabled={isLoading}
         >
           <FaPaperPlane />
         </button>
